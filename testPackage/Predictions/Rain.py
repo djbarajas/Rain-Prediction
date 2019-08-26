@@ -18,7 +18,7 @@ class Rain:
 
 
 	#adding the data points
-	#the sin and cos are to compute the sin and cos of 0-364 which are days of the year.  This adds kore useful easily obtained features.
+	#the sin and cos are to compute the sin and cos of 0-364 which are days of the year.  This adds more useful, easily obtained features.
 	def input_train_data(self, year, month, day, hour, sin, cos, latitude, longitude, feature, rainfall):
 		dataPoint = [year, month, day, hour, sin, cos, latitude, longitude, feature]
 		self.X_train.append(dataPoint)
