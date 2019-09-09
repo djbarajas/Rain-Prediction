@@ -3,6 +3,7 @@ from sklearn import metrics
 import pickle
 import numpy as np
 
+
 class Level:
 
     # for initializing train and test sets, classifier and accuracy score
