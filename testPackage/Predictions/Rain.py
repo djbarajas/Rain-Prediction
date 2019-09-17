@@ -81,13 +81,23 @@ class Rain:
 		plt.show()
 
 
-	#save classifier
+	# save classifier
 	def save_classifier(self, classifierName):
 		filename = classifierName + ".pkl"
 		pickle.dump(self.rf_clf, open(filename, 'wb'))
 
 
-	#open saved classifier
+	# open saved classifier
 	def open_classifier(self, classifierName):
 		filename = classifierName + ".pkl"
 		self.rf_clf = pickle.load(open(filename, 'rb'))
+
+	# removes all training data
+	def clean_train(self):
+		self.X_train = []
+		self.X_labels = []
+
+	# removes all testing data
+	def clean_train(self):
+		self.test = []
+		self.test_labels = []

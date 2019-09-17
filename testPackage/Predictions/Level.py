@@ -52,11 +52,21 @@ class Level:
         return self.error
 
     # save classifier
-    def save_classifier(self, classifierName):
-        filename = classifierName + ".pkl"
+    def save_classifier(self, classifier_name):
+        filename = classifier_name + ".pkl"
         pickle.dump(self.model, open(filename, 'wb'))
 
     # open saved classifier
-    def open_classifier(self, classifierName):
-        filename = classifierName + ".pkl"
+    def open_classifier(self, classifier_name):
+        filename = classifier_name + ".pkl"
         self.model = pickle.load(open(filename, 'rb'))
+
+    # removes all training data
+    def clean_train(self):
+        self.X_train = []
+        self.X_labels = []
+
+    # removes all testing data
+    def clean_train(self):
+        self.test = []
+        self.test_labels = []
