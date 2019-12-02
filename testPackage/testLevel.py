@@ -28,6 +28,7 @@ for line in dataFile:
     #input the data
     classifier.input_train_data(year, month, day, hour, sin, cos, latitude, longitude, temperature, float(x[9]))
 
+
 dataFile.close()
 
 # process the testing data
@@ -61,4 +62,4 @@ classifier.train()
 print("Predicting, this will take a minute")
 print("Predictions: ",classifier.predict())
 
-print("MAE of classifier: ", classifier.check_error())
+#print("MAE of classifier: ", classifier.check_error())

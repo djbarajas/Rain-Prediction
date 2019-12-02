@@ -6,7 +6,6 @@ import pickle
 
 class Rain:
 
-	#for initializing train and test sets, classifier and accuracy score
 	def __init__(self):
 		self.X_train = []
 		self.X_labels = []
@@ -14,11 +13,15 @@ class Rain:
 		self.test_labels = []
 		self.rf_clf = RandomForestClassifier()
 		self.prediction = 0
-		self.acc = 0
+		self. acc = 0
 
+	# adding the data points
+	def input_train_data(self, features, rainfall):
+		self.X_train.append(features)
+		self.X_labels.append(rainfall)
 
 	#adding the data points
-	#the sin and cos are to compute the sin and cos of 0-364 which are days of the year.  This adds more useful, easily obtained features.
+	#the sin and cos are to compute the sin and cos of 0-364 which are days of the year.  This adds kore useful easily obtained features.
 	def input_train_data(self, year, month, day, hour, sin, cos, latitude, longitude, feature, rainfall):
 		dataPoint = [year, month, day, hour, sin, cos, latitude, longitude, feature]
 		self.X_train.append(dataPoint)
@@ -27,11 +30,18 @@ class Rain:
 	#train the data
 	def train(self):
 		self.rf_clf.fit(self.X_train,self.X_labels)
+		self.X_train = []
+		self.X_labels = []
 
 	#input test data
 	def input_test_data(self, year, month, day, hour, sin, cos, latitude, longitude, feature):
 		dataPoint = [year, month, day, hour, sin, cos, latitude, longitude, feature]
 		self.test.append(dataPoint)
+
+	def input_test_data(self, features):
+		if len(self.test) > 0 and isinstance(self.test, np.ndarray):
+			self.test = self.test.tolist()
+		self.test.append(features)
 
 	#input test labels
 	def label(self, label):
@@ -40,11 +50,15 @@ class Rain:
 	#test data
 	def predict(self):
 		self.prediction = self.rf_clf.predict(self.test)
+		self.test = []
+		self.test_labels = []
 		return self.prediction
 
 	#check probability
 	def predict_prob(self):
 		probability = self.rf_clf.predict_proba(self.test)
+		self.test = []
+		self.test_labels = []
 		return probability
 
 	# check accuracy
@@ -53,7 +67,7 @@ class Rain:
 			self.acc = accuracy_score(self.prediction,self.test_labels)
 			print(self.acc)
 		else:
-			print("unable to check accuracy score untill all data is labeled")
+			print("unable to check accuracy score until all data is labeled")
 
 
 
@@ -81,13 +95,13 @@ class Rain:
 		plt.show()
 
 
-	# save classifier
+	#save classifier
 	def save_classifier(self, classifierName):
 		filename = classifierName + ".pkl"
 		pickle.dump(self.rf_clf, open(filename, 'wb'))
 
 
-	# open saved classifier
+	#open saved classifier
 	def open_classifier(self, classifierName):
 		filename = classifierName + ".pkl"
 		self.rf_clf = pickle.load(open(filename, 'rb'))
