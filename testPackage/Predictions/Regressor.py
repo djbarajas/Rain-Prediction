@@ -1,41 +1,34 @@
 from xgboost import XGBRegressor
 from sklearn import metrics
-import pickle
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 
-class Temperature:
+class Regressor:
 
     # for initializing train and test sets, classifier and accuracy score
     # Change method to gpu_hist if you want xgboost to run on a GPU
-    def __init__(self, method='auto'):
+    def __init__(self, params ={'objective':'reg:squarederror', 'verbosity':0}):
         self.X_train = []
         self.X_labels = []
         self.test = []
         self.test_labels = []
-        self.model = XGBRegressor(tree_method=method, objective ='reg:squarederror', learning_rate=0.01)
+        self.model = XGBRegressor(**params)
         self.prediction = 0
         self.error = 0
 
-
+    def size(self):
+        if isinstance(self.X_train, np.ndarray):
+            return self.X_train.size
+        return len(self.X_train)
 
     # adding the data points
-    def input_train_data(self, features, temperature):
+    def input_train(self, features, feature):
         if isinstance(self.X_train, np.ndarray) and self.X_train.size > 0:
             self.X_train = self.X_train.tolist()
             self.X_labels = self.X_labels.tolist()
         self.X_train.append(features)
-        self.X_labels.append(temperature)
-    # adding the data points
-    # the sin and cos are to compute the sin and cos of 0-364 which are days of the year.
-    # This adds more useful, easily obtained features.
-    def input_train_data1(self, year, month, day, hour, sin, cos, latitude, longitude,  temperature):
-        if isinstance(self.X_train, np.ndarray) and self.X_train.size > 0:
-            self.X_train = self.X_train.tolist()
-            self.X_labels = self.X_labels.tolist()
-        data_point = [year, month, day, hour, sin, cos, latitude, longitude]
-        self.X_train.append(data_point)
-        self.X_labels.append(temperature)
+        self.X_labels.append(feature)
 
     # train the data
     def train(self):
@@ -43,15 +36,26 @@ class Temperature:
         self.X_labels = np.asarray(self.X_labels)
         self.model.fit(self.X_train, self.X_labels)
 
-        # self.X_train = []
-        # self.X_labels = []
-
-    # input test data
-    def input_test_data(self, year, month, day, hour, sin, cos, latitude, longitude):
-        if isinstance(self.test, np.ndarray) and self.test.size > 0:
-            self.test = self.test.tolist()
-        data_point = [year, month, day, hour, sin, cos, latitude, longitude]
-        self.test.append(data_point)
+    def train_eval(self, metric='error'):
+        self.X_train = np.asarray(self.X_train)
+        self.X_labels = np.asarray(self.X_labels)
+        X_train, X_test, y_train, y_test = train_test_split(self.X_train, self.X_labels, test_size=0.33)
+        self.model.fit(X_train, y_train,
+            eval_set=[(X_train, y_train), (X_test, y_test)],
+            eval_metric=metric)
+        evals_result = self.model.evals_result()
+        if metric == 'error':
+            validations = []
+            for val in evals_result.values():
+                lst = val.get("error")
+                validations.append(sum(lst) / len(lst))
+            return 1 - (sum(validations) / len(validations))
+        else:
+            validations = []
+            for val in evals_result.values():
+                lst = val.get(metric)
+                validations.append(lst[-1])
+            return validations
 
     # input test labels if you want to check accuracy
     def label(self, label):
@@ -64,11 +68,9 @@ class Temperature:
 
     # test data
     def predict(self):
-        self.test = np.asarray(self.test)
+        if not isinstance(self.test, np.ndarray):
+            self.test = np.asarray(self.test)
         self.prediction = self.model.predict(self.test)
-
-        # self.test = []
-        # self.test_labels = []
         return self.prediction
 
     # if you have the test labels you can check the error rate (you want error close to 0)
@@ -78,14 +80,12 @@ class Temperature:
         return self.error
 
     # save classifier
-    def save_classifier(self, classifierName):
-        filename = classifierName + ".pkl"
-        pickle.dump(self.model, open(filename, 'wb'))
+    def save_classifier(self, file):
+        self.model.save_model(file)
 
     # open saved classifier
-    def open_classifier(self, classifierName):
-        filename = classifierName + ".pkl"
-        self.model = pickle.load(open(filename, 'rb'))
+    def open_classifier(self, file):
+        self.model.load_model(file)
 
     # removes all training data
     def clean_train(self):

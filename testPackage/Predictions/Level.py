@@ -7,12 +7,13 @@ import numpy as np
 class Level:
 
     # for initializing train and test sets, classifier and accuracy score
-    def __init__(self):
+    # Change method to gpu_hist if you want xgboost to run on a GPU
+    def __init__(self, method='auto'):
         self.X_train = []
         self.X_labels = []
         self.test = []
         self.test_labels = []
-        self.model = XGBRegressor(learning_rate=0.01)
+        self.model = XGBRegressor(tree_method=method, objective='reg:squarederror', learning_rate=0.01)
         self.prediction = 0
         self.error = 0
 
@@ -27,7 +28,7 @@ class Level:
     # adding the data points
     # the sin and cos are to compute the sin and cos of 0-364 which are days of the year.
     # This adds more useful, easily obtained features.
-    def input_train_data(self, year, month, day, hour, sin, cos, latitude, longitude, feature, rainfall):
+    def input_train_data1(self, year, month, day, hour, sin, cos, latitude, longitude, feature, rainfall):
         if isinstance(self.X_train, np.ndarray) and self.X_train.size > 0:
             self.X_train = self.X_train.tolist()
             self.X_labels = self.X_labels.tolist()
@@ -45,7 +46,7 @@ class Level:
         # self.X_labels = []
 
     # input test data
-    def input_test_data(self, year, month, day, hour, sin, cos, latitude, longitude, feature):
+    def input_test_data2(self, year, month, day, hour, sin, cos, latitude, longitude, feature):
         if isinstance(self.test, np.ndarray) and self.test.size > 0:
             self.test = self.test.tolist()
         data_point = [year, month, day, hour, sin, cos, latitude, longitude, feature]
@@ -90,6 +91,6 @@ class Level:
         self.X_labels = []
 
     # removes all testing data
-    def clean_train(self):
+    def clean_test(self):
         self.test = []
         self.test_labels = []

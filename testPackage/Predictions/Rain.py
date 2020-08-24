@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import pickle
 
+
 class Rain:
 
 	def __init__(self):
@@ -11,7 +12,7 @@ class Rain:
 		self.X_labels = []
 		self.test = []
 		self.test_labels = []
-		self.rf_clf = RandomForestClassifier()
+		self.rf_clf = RandomForestClassifier(n_estimators=10)
 		self.prediction = 0
 		self. acc = 0
 
@@ -22,7 +23,7 @@ class Rain:
 
 	#adding the data points
 	#the sin and cos are to compute the sin and cos of 0-364 which are days of the year.  This adds kore useful easily obtained features.
-	def input_train_data(self, year, month, day, hour, sin, cos, latitude, longitude, feature, rainfall):
+	def input_train_data1(self, year, month, day, hour, sin, cos, latitude, longitude, feature, rainfall):
 		dataPoint = [year, month, day, hour, sin, cos, latitude, longitude, feature]
 		self.X_train.append(dataPoint)
 		self.X_labels.append(rainfall)
@@ -38,7 +39,8 @@ class Rain:
 		dataPoint = [year, month, day, hour, sin, cos, latitude, longitude, feature]
 		self.test.append(dataPoint)
 
-	def input_test_data(self, features):
+	def input_test(self, features):
+
 		if len(self.test) > 0 and isinstance(self.test, np.ndarray):
 			self.test = self.test.tolist()
 		self.test.append(features)
@@ -115,3 +117,4 @@ class Rain:
 	def clean_train(self):
 		self.test = []
 		self.test_labels = []
+
